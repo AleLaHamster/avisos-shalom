@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar archivos
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           persist-credentials: true
 
       - name: Preparar Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
