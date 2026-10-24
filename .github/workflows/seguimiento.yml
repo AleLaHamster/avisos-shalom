@@ -1,0 +1,44 @@
+name: Avisos de paquetes Shalom
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar archivos
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Revisar paquetes
+        env:
+          TRACKING_API_KEY: ${{ secrets.TRACKING_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GUIA_CHACHAPOYAS: ${{ secrets.GUIA_CHACHAPOYAS }}
+          CODIGO_CHACHAPOYAS: ${{ secrets.CODIGO_CHACHAPOYAS }}
+          GUIA_PUCALLPA: ${{ secrets.GUIA_PUCALLPA }}
+          CODIGO_PUCALLPA: ${{ secrets.CODIGO_PUCALLPA }}
+          GUIA_LIMA: ${{ secrets.GUIA_LIMA }}
+          CODIGO_LIMA: ${{ secrets.CODIGO_LIMA }}
+        run: python avisos_shalom.py
+
+      - name: Guardar estados para la próxima revisión
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add estados_avisados.json
+          git diff --cached --quiet || git commit -m "Actualizar estados de paquetes"
+          git push
